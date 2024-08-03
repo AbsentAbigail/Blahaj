@@ -1,5 +1,4 @@
-﻿using Blahaj.Calm;
-using Deadpan.Enums.Engine.Components.Modding;
+﻿using Deadpan.Enums.Engine.Components.Modding;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -21,15 +20,17 @@ namespace Blahaj
 
         public override string Description => "Add your favourite Ikea plushie to the game!";
 
-        private string CalmKeyword => $"<keyword={GUID}.calm>";
         private string StatusCalm => "Calm";
-        private string StatusApplyCalmToAllyInFront => "On Turn Apply Calm To Ally In Front";
-        private string StatusHealAllyInFront => "On Turn Heal Ally in Front";
+        private string StatusApplyCalmToAllyInFront => "On Turn Apply Calm To AllyInFrontOf";
+        private string StatusOnKillApplyCalmToSelf => "On Kill Apply Calm To Self";
+        private string KeywordCalm => "calm";
+        private string KeywordTagCalm => "<keyword=" + GUID + "." + KeywordCalm + ">";
 
-        private List<CardDataBuilder> cards;                 //The list of custom CardData(Builder)
-        private List<StatusEffectDataBuilder> statusEffects; //The list of custom StatusEffectData(Builder)
+        private List<CardDataBuilder> cards;
+        private List<StatusEffectDataBuilder> statusEffects;
         private List<KeywordDataBuilder> keywords;
-        private bool preLoaded = false;                      //Used to prevent redundantly reconstructing our data. Not truly necessary.
+        private List<CardUpgradeDataBuilder> cardUpgrades;
+        private bool preLoaded = false;
 
         private void CreateModAssets()
         {
@@ -38,110 +39,125 @@ namespace Blahaj
                 new StatusEffectDataBuilder(this)
                     .Create<StatusEffectCalm>(StatusCalm)
                     .WithCanBeBoosted(false)
-                    //.WithIconGroupName("health")
-                    .WithText("<{a}> Calm")
-                    .WithIsStatus(true)
+                    .WithText("{a} " + KeywordTagCalm)
+                    .WithType("")
                     .WithStackable(true)
-                    .WithVisible(true)
-                    .FreeModify<StatusEffectCalm>(delegate(StatusEffectCalm data)
+                    .FreeModify((data) =>
                     {
-                        data.applyToFlags = ApplyToFlags.Self;
-                        data.whenAppliedTypes = new string[1] { StatusCalm };
-                        data.effectToApply = Get<StatusEffectData>("Reduce Max Counter");
-                        data.applyEqualAmount = false;
+                        ((StatusEffectCalm)data).applyToFlags = ApplyToFlags.Self;
+                        ((StatusEffectCalm)data).effectToApply = Get<StatusEffectData>("Reduce Max Counter");
+                        ((StatusEffectCalm)data).effectToApply2 = Get<StatusEffectData>("Increase Max Counter");
+                        ((StatusEffectCalm)data).applyEqualAmount = true;
                     }),
 
                 new StatusEffectDataBuilder(this)
                     .Create<StatusEffectApplyXOnTurn>(StatusApplyCalmToAllyInFront)
                     .WithCanBeBoosted(true)
-                    .WithText($"Apply <{{a}}> {CalmKeyword} to ally in front.")
-                    .WithStackable(true)
+                    .WithText("Apply <{a}> " + KeywordTagCalm + " to ally in front.")
                     .WithType("")
-                    .FreeModify<StatusEffectApplyXOnTurn>(delegate(StatusEffectApplyXOnTurn data)
+                    .WithStackable(true)
+                    .SubscribeToAfterAllBuildEvent(delegate (StatusEffectData data)
                     {
-                        data.applyToFlags = ApplyToFlags.AllyInFrontOf;
-                        data.effectToApply = Get<StatusEffectData>(StatusCalm);
+                        ((StatusEffectApplyXOnTurn)data).applyToFlags = ApplyToFlags.AllyInFrontOf;
+                        ((StatusEffectApplyXOnTurn)data).effectToApply = Get<StatusEffectData>(StatusCalm);
                     }),
 
                 new StatusEffectDataBuilder(this)
-                    .Create<StatusEffectApplyXOnTurn>(StatusHealAllyInFront)
-                    .WithCanBeBoosted(true)
-                    .WithText($"Restore <{{a}}><keyword=health> to ally in front.")
+                    .Create<StatusEffectApplyXOnKill>(StatusOnKillApplyCalmToSelf)
+                    .WithCanBeBoosted(false)
+                    .WithText("Gain {a} " + KeywordTagCalm + " on kill.")
+                    .WithType("")
                     .WithStackable(true)
-                    .WithType("heal")
-                    .FreeModify<StatusEffectApplyXOnTurn>(delegate(StatusEffectApplyXOnTurn data)
+                    .SubscribeToAfterAllBuildEvent((data) => 
                     {
-                        data.applyToFlags = ApplyToFlags.AllyInFrontOf;
-                        data.effectToApply = Get<StatusEffectData>("Heal (No Ping)");
+                        ((StatusEffectApplyXOnKill)data).applyToFlags = ApplyToFlags.Self;
+                        ((StatusEffectApplyXOnKill)data).effectToApply = Get<StatusEffectData>(StatusCalm);
                     }),
             };
-            LogHelper.Log("Status effects added");
+            LogHelper.Log("Status Effects added");
+
+            keywords = new List<KeywordDataBuilder>
+            {
+                new KeywordDataBuilder(this)
+                    .Create(KeywordCalm)
+                    .WithTitle("Calm")
+                    .WithTitleColour(Color(91, 206, 250)) // Light Blue
+                    .WithShowName(true)
+                    .WithDescription($"Reduce max <keyword=counter> for every three {KeywordTagCalm}.|Halves when damaged")
+                    .WithBodyColour(Color(245, 169, 184)) // Pink
+                    .WithNoteColour(Color(255, 255, 255)) // White
+            };
+            LogHelper.Log("Calm Keyword added");
 
             cards = new List<CardDataBuilder>
             {
                 new CardDataBuilder(this)
                     .CreateUnit("blahaj", "Blahaj")
                     .SetSprites("blahaj.png", "blahajBG.png")
-                    .SetStats(6, null, 2)
+                    .SetStats(12, null, 3)
                     .WithCardType("Friendly")
                     .WithBloodProfile("Blood Profile Pink Wisp")
                     .AddPool("GeneralUnitPool")
-                    .SubscribeToAfterAllBuildEvent(
-                        delegate (CardData card)
+                    .WithFlavour("Accepts and loves you <3")
+                    .SubscribeToAfterAllBuildEvent((data) =>
+                    {
+                        data.startWithEffects = new CardData.StatusEffectStacks[1]
                         {
-                            card.startWithEffects = new CardData.StatusEffectStacks[2]
-                            {
-                                SStack(StatusHealAllyInFront, 1),
-                                SStack(StatusApplyCalmToAllyInFront, 1)
-                            };
-                        }),
+                            SStack(StatusApplyCalmToAllyInFront, 2)
+                        };
+                    })
             };
             LogHelper.Log("Blahaj added");
 
-            keywords = new List<KeywordDataBuilder>()
+            cardUpgrades = new List<CardUpgradeDataBuilder>()
             {
-                new KeywordDataBuilder(this)
-                .Create("calm")                               //The internal name for the upgrade.
-                .WithTitle("Calm")                            //The in-game name for the upgrade.
-                .WithTitleColour(new Color(0.85f, 0.44f, 0.85f)) //Light purple on the title of the keyword pop-up
-                .WithShowName(true)                              //Shows name in Keyword box (as opposed to a nonexistant icon).
-                .WithDescription($"Reduce <keyword=counter> by one after gaining three {CalmKeyword}.|Removed upon activating") //Format is body|note.
-                .WithNoteColour(new Color(0.85f, 0.44f, 0.85f))  //Somewhat teal
-                .WithBodyColour(new Color(0.2f, 0.5f, 0.5f))       //Cyan-ish
-                .WithCanStack(true),
-                
+                new CardUpgradeDataBuilder(this)
+                    .CreateCharm("CardUpgradeShark")
+                    .WithImage("SharkCharm.png")
+                    .WithTitle("Shark Charm")
+                    .WithText("Gain 1 " + KeywordTagCalm + " on kill.")
+                    .WithTier(2)
+                    .SetConstraints(new TargetConstraintMaxCounterMoreThan())
+                    .SubscribeToAfterAllBuildEvent((data) =>
+                    {
+                        data.effects = new CardData.StatusEffectStacks[1] { SStack(StatusOnKillApplyCalmToSelf, 1) };
+                    })
             };
-            LogHelper.Log("Keywords added");
+            LogHelper.Log("Shark charm added");
 
             preLoaded = true;
         }
 
-        protected override void Load()
+        public override void Load()
         {
             if (!preLoaded)
             {
                 CreateModAssets();
-
             }
             base.Load();
         }
 
-        protected override void Unload()
+        public override void Unload()
         {
             base.Unload();
         }
 
-        public override List<T> AddAssets<T, Y>()           //This method is called 6-7 times in base.Load() for each Builder. Can you name them all?
+        public override List<T> AddAssets<T, Y>()
         {
             var typeName = typeof(Y).Name;
-            switch (typeName)                                //Checks what the current builder is
+            switch (typeName)
             {
                 case nameof(CardData):
-                    return cards.Cast<T>().ToList();         //Loads our cards
+                    return cards.Cast<T>().ToList();
+
                 case nameof(StatusEffectData):
-                    return statusEffects.Cast<T>().ToList(); //Loads our status effects
+                    return statusEffects.Cast<T>().ToList();
+
                 case nameof(KeywordData):
                     return keywords.Cast<T>().ToList();
+
+                case nameof(CardUpgradeData):
+                    return cardUpgrades.Cast<T>().ToList();
 
                 default:
                     return null;
@@ -157,6 +173,17 @@ namespace Blahaj
             StatusEffectDataBuilder builder = data.Edit<StatusEffectData, StatusEffectDataBuilder>();
             builder.Mod = this;
             return builder;
+        }
+
+        private Color Color(int r, int b, int g)
+        {
+            Color color = new Color(
+                r / 255F,
+                b / 255F,
+                g / 255F
+            );
+
+            return color;
         }
     }
 }

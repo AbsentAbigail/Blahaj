@@ -1,9 +1,8 @@
-﻿using Deadpan.Enums.Engine.Components.Modding;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Blahaj
 {
-    static class LogHelper
+    internal static class LogHelper
     {
         public static void Log(string message)
         {
