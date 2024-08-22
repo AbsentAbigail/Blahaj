@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace Blahaj
 {
-    internal class StatusEffectCalm : StatusEffectApplyX
+    internal class StatusCalm : StatusEffectApplyX
     {
         public StatusEffectData effectToApply2;
         private int currentReduction;
