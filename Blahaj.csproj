@@ -384,16 +384,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PartialMod\BlahajModAftonsparv.cs" />
+    <Compile Include="PartialMod\BlahajModBlackfisk.cs" />
+    <Compile Include="PartialMod\BlahajModBlahaj.cs" />
     <Compile Include="BlahajMod.cs" />
+    <Compile Include="PartialMod\BlahajModKramig.cs" />
+    <Compile Include="PartialMod\BlahajModVal.cs" />
     <Compile Include="DataHelpers.cs" />
     <Compile Include="LogHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StatusCalm.cs" />
-    <Compile Include="StatusInstantIncreaseCounter.cs" />
-    <Compile Include="StatusStress.cs" />
-    <Compile Include="StatusInstantEatCard.cs" />
-    <Compile Include="StatusAbducted.cs" />
-    <Compile Include="StatusOnHitEat.cs" />
+    <Compile Include="StatusEffects\StatusCalm.cs" />
+    <Compile Include="StatusEffects\StatusInstantIncreaseCounter.cs" />
+    <Compile Include="StatusEffects\StatusStress.cs" />
+    <Compile Include="StatusEffects\StatusInstantEatCard.cs" />
+    <Compile Include="StatusEffects\StatusAbducted.cs" />
+    <Compile Include="StatusEffects\StatusOnHitEat.cs" />
     <Compile Include="ValCardImage.cs" />
   </ItemGroup>
   <ItemGroup>

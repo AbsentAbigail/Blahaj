@@ -4,12 +4,10 @@ using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine.AddressableAssets;
-using UnityEngine.Localization.Tables;
-using UnityEngine.Localization;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.Localization;
+using UnityEngine.Localization.Tables;
 
 namespace Blahaj
 {
@@ -95,6 +93,7 @@ namespace Blahaj
             return dataFile;
         }
     }
+
     public static class BuildingPlotTypeHelpers
     {
         public static BuildingPlotType WithIllegalBuildings(this BuildingPlotType dataFile, params BuildingType[] illegalBuildings)
@@ -103,6 +102,7 @@ namespace Blahaj
             return dataFile;
         }
     }
+
     public static class BuildingTypeHelpers
     {
         public static BuildingType WithTitle(this BuildingType dataFile, LocalizedString title)
@@ -163,6 +163,7 @@ namespace Blahaj
             return dataFile;
         }
     }
+
     public static class CampaignNodeTypeHelpers
     {
         public static CampaignNodeType WithLetter(this CampaignNodeType dataFile, string letter)
@@ -261,9 +262,9 @@ namespace Blahaj
             return dataFile;
         }
     }
+
     public static class CardDataHelpers
     {
-
         public static CardData SetStats(this CardData dataFile, int? health = null, int? damage = null, int counter = 0)
         {
             return dataFile.SetHealth(health).SetDamage(damage).SetCounter(counter);
@@ -414,6 +415,7 @@ namespace Blahaj
             dataFile.canShoveToOtherRow = value;
             return dataFile;
         }
+
         public static CardData WithCardType(this CardData dataFile, CardType type)
         {
             dataFile.cardType = type;
@@ -468,6 +470,7 @@ namespace Blahaj
             return dataFile;
         }
     }
+
     public static class CardTypeHelpers
     {
         public static CardType WithSortPriority(this CardType dataFile, int sortPriority)
@@ -592,9 +595,9 @@ namespace Blahaj
             return dataFile;
         }
     }
+
     public static class CardUpgradeDataHelpers
     {
-
         public static CardUpgradeData WithTier(this CardUpgradeData dataFile, int tier)
         {
             dataFile.tier = tier;
@@ -743,6 +746,7 @@ namespace Blahaj
             return dataFile;
         }
     }
+
     public static class ChallengeDataHelpers
     {
         public static ChallengeData WithText(this ChallengeData dataFile, LocalizedString str)
@@ -829,6 +833,7 @@ namespace Blahaj
             return dataFile;
         }
     }
+
     public static class ChallengeListenerHelpers
     {
         public static ChallengeListener WithKey(this ChallengeListener dataFile, string key)
@@ -856,6 +861,7 @@ namespace Blahaj
             return dataFile;
         }
     }
+
     public static class ClassDataHelpers
     {
         public static ClassData WithRequiresUnlock(this ClassData dataFile, UnlockData requiresUnlock)
@@ -893,6 +899,7 @@ namespace Blahaj
             dataFile.selectSfxEvent = selectSfxEvent;
             return dataFile;
         }
+
         /// <summary>see vanilla references</summary>
         /// <param name="selectSfxEvent">format: "event:/..."</param>
         public static ClassData WithSelectSfxEvent(this ClassData dataFile, string selectSfxEvent)
@@ -913,6 +920,7 @@ namespace Blahaj
             return dataFile;
         }
     }
+
     public static class EyeDataHelpers
     {
         public static EyeData WithCardData(this EyeData dataFile, string cardData)
@@ -933,6 +941,7 @@ namespace Blahaj
             return dataFile;
         }
     }
+
     public static class GameModeHelpers
     {
         public static GameMode WithSaveFileName(this GameMode dataFile, string saveFileName)
@@ -1067,6 +1076,7 @@ namespace Blahaj
             return dataFile;
         }
     }
+
     public static class GameModifierDataHelpers
     {
         public static GameModifierData WithValue(this GameModifierData dataFile, int value = 100)
@@ -1174,6 +1184,7 @@ namespace Blahaj
             dataFile.ringSfxEvent = ringSfxEvent;
             return dataFile;
         }
+
         /// <summary>see vanilla references</summary>
         /// <param name="selectSfxEvent">format: "event:/..."</param>
         public static GameModifierData WithRingSfxEvent(this GameModifierData dataFile, string ringSfxEvent)
@@ -1194,6 +1205,7 @@ namespace Blahaj
             return dataFile;
         }
     }
+
     public static class KeywordDataHelpers
     {
         public static KeywordData WithTitle(this KeywordData dataFile, string title, SystemLanguage lang = SystemLanguage.English)
@@ -1284,6 +1296,7 @@ namespace Blahaj
             return dataFile;
         }
     }
+
     public static class StatusEffectDataHelpers
     {
         public static StatusEffectData WithIsStatus(this StatusEffectData dataFile, bool value)
@@ -1378,6 +1391,7 @@ namespace Blahaj
             return dataFile;
         }
     }
+
     public static class TraitDataHelpers
     {
         public static TraitData WithKeyword(this TraitData dataFile, KeywordData data)
@@ -1404,6 +1418,7 @@ namespace Blahaj
             return dataFile;
         }
     }
+
     public static class UnlockDataHelpers
     {
         public static UnlockData WithUnlockDescription(this UnlockData dataFile, LocalizedString str)
